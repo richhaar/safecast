@@ -8,7 +8,7 @@ endif()
 
 project ("SafeCast")
 
-add_library(SafeCast INTERFACE "safe_cast.hpp")
+add_library(SafeCast INTERFACE src/safe_cast.hpp)
 set_property(TARGET SafeCast PROPERTY CXX_STANDARD 20)
 
 include(FetchContent)
@@ -23,7 +23,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 include(GoogleTest)
 
-add_executable(SafeCastTest safe_cast_test.cxx)
+add_executable(SafeCastTest src/safe_cast_test.cxx)
 set_property(TARGET SafeCastTest PROPERTY CXX_STANDARD 20)
 target_link_libraries(SafeCastTest PRIVATE SafeCast GTest::gtest_main)
 gtest_discover_tests(SafeCastTest)
