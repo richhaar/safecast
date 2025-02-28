@@ -1,4 +1,32 @@
-﻿#include "safe_cast.hpp"
+﻿/*****************************************************************************
+ * @file safe_cast_Test.cxx
+ * @brief Provides testing for the safe_cast function.
+ * @author Richard Haar https://github.com/richhaar
+ * @date 28/02/2025
+ *
+ * @licenseblock{MIT License}
+ * Copyright (c) 2025 Richard Haar
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * @endlicenseblock
+ ****************************************************************************/
+#include "safe_cast.hpp"
 
 #include <gtest/gtest.h>
 
@@ -7,248 +35,124 @@
 
 namespace sc {
 namespace {
-class SafeCast : public ::testing::Test {
- protected:
-  uint8_t const maxuint8 = std::numeric_limits<uint8_t>::max();
-  uint16_t const maxuint16 = std::numeric_limits<uint16_t>::max();
-  uint32_t const maxuint32 = std::numeric_limits<uint32_t>::max();
-  uint64_t const maxuint64 = std::numeric_limits<uint64_t>::max();
 
-  uint8_t const minuint8 = std::numeric_limits<uint8_t>::min();
-  uint16_t const minuint16 = std::numeric_limits<uint16_t>::min();
-  uint32_t const minuint32 = std::numeric_limits<uint32_t>::min();
-  uint64_t const minuint64 = std::numeric_limits<uint64_t>::min();
+TEST(SafeCast, SignedUnderflow) {
+  EXPECT_THROW(safe_cast<int8_t>(std::numeric_limits<int16_t>::min()),
+               std::underflow_error);
+  EXPECT_THROW(safe_cast<int16_t>(std::numeric_limits<int32_t>::min()),
+               std::underflow_error);
+  EXPECT_THROW(safe_cast<int32_t>(std::numeric_limits<int64_t>::min()),
+               std::underflow_error);
+}
 
-  int8_t const maxint8 = std::numeric_limits<int8_t>::max();
-  int16_t const maxint16 = std::numeric_limits<int16_t>::max();
-  int32_t const maxint32 = std::numeric_limits<int32_t>::max();
-  int64_t const maxint64 = std::numeric_limits<int64_t>::max();
+TEST(SafeCast, UnsignedUnderflow) {
+  EXPECT_THROW(safe_cast<uint8_t>(std::numeric_limits<int8_t>::min()),
+               std::underflow_error);
+  EXPECT_THROW(safe_cast<uint16_t>(std::numeric_limits<int8_t>::min()),
+               std::underflow_error);
+  EXPECT_THROW(safe_cast<uint32_t>(std::numeric_limits<int8_t>::min()),
+               std::underflow_error);
+  EXPECT_THROW(safe_cast<uint64_t>(std::numeric_limits<int8_t>::min()),
+               std::underflow_error);
+}
 
-  int8_t const minint8 = std::numeric_limits<int8_t>::min();
-  int16_t const minint16 = std::numeric_limits<int16_t>::min();
-  int32_t const minint32 = std::numeric_limits<int32_t>::min();
-  int64_t const minint64 = std::numeric_limits<int64_t>::min();
-};
+TEST(SafeCast, WidthOverflow) {
+  EXPECT_THROW(safe_cast<int8_t>(std::numeric_limits<int16_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<int16_t>(std::numeric_limits<int32_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<int32_t>(std::numeric_limits<int64_t>::max()),
+               std::overflow_error);
 
-TEST_F(SafeCast, CastUint8t) {
+  EXPECT_THROW(safe_cast<uint8_t>(std::numeric_limits<uint16_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<uint16_t>(std::numeric_limits<uint32_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<uint32_t>(std::numeric_limits<uint64_t>::max()),
+               std::overflow_error);
+}
+
+TEST(SafeCast, WidthUnderflow) {
+  EXPECT_THROW(safe_cast<int8_t>(std::numeric_limits<int16_t>::min()),
+               std::underflow_error);
+  EXPECT_THROW(safe_cast<int16_t>(std::numeric_limits<int32_t>::min()),
+               std::underflow_error);
+  EXPECT_THROW(safe_cast<int32_t>(std::numeric_limits<int64_t>::min()),
+               std::underflow_error);
+}
+
+TEST(SafeCast, UnsignedToSignedOverflow) {
+  EXPECT_THROW(safe_cast<int8_t>(std::numeric_limits<uint8_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<int16_t>(std::numeric_limits<uint16_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<int32_t>(std::numeric_limits<uint32_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<int64_t>(std::numeric_limits<uint64_t>::max()),
+               std::overflow_error);
+}
+
+TEST(SafeCast, SignedToUnsignedOverflow) {
+  EXPECT_THROW(safe_cast<uint8_t>(std::numeric_limits<int16_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<uint16_t>(std::numeric_limits<int32_t>::max()),
+               std::overflow_error);
+  EXPECT_THROW(safe_cast<uint32_t>(std::numeric_limits<int64_t>::max()),
+               std::overflow_error);
+}
+
+TEST(SafeCast, NoThrowOfSameTypes) {
+  EXPECT_NO_THROW(safe_cast<int8_t>(std::numeric_limits<int8_t>::max()));
+  EXPECT_NO_THROW(safe_cast<int8_t>(std::numeric_limits<int8_t>::min()));
   EXPECT_NO_THROW(safe_cast<uint8_t>(std::numeric_limits<uint8_t>::max()));
-  EXPECT_THROW(safe_cast<uint8_t>(maxuint16), std::overflow_error);
-  EXPECT_THROW(safe_cast<uint8_t>(maxuint32), std::overflow_error);
-  EXPECT_THROW(safe_cast<uint8_t>(maxuint64), std::overflow_error);
+  EXPECT_NO_THROW(safe_cast<uint8_t>(std::numeric_limits<uint8_t>::min()));
 
-  EXPECT_NO_THROW(safe_cast<uint8_t>(maxint8));
-  EXPECT_THROW(safe_cast<uint8_t>(maxint16), std::overflow_error);
-  EXPECT_THROW(safe_cast<uint8_t>(maxint32), std::overflow_error);
-  EXPECT_THROW(safe_cast<uint8_t>(maxint64), std::overflow_error);
-
-  EXPECT_NO_THROW(safe_cast<uint8_t>(minuint8));
-  EXPECT_NO_THROW(safe_cast<uint8_t>(minuint16));
-  EXPECT_NO_THROW(safe_cast<uint8_t>(minuint32));
-  EXPECT_NO_THROW(safe_cast<uint8_t>(minuint64));
-
-  EXPECT_THROW(safe_cast<uint8_t>(minint8), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint8_t>(minint16), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint8_t>(minint32), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint8_t>(minint64), std::underflow_error);
+  EXPECT_NO_THROW(safe_cast<int64_t>(std::numeric_limits<int64_t>::max()));
+  EXPECT_NO_THROW(safe_cast<int64_t>(std::numeric_limits<int64_t>::min()));
+  EXPECT_NO_THROW(safe_cast<uint64_t>(std::numeric_limits<uint64_t>::max()));
+  EXPECT_NO_THROW(safe_cast<uint64_t>(std::numeric_limits<uint64_t>::min()));
 }
 
-TEST_F(SafeCast, CastUint16t) {
-  EXPECT_NO_THROW(safe_cast<uint16_t>(maxuint8));
-  EXPECT_NO_THROW(safe_cast<uint16_t>(maxuint16));
-  EXPECT_THROW(safe_cast<uint16_t>(maxuint32), std::overflow_error);
-  EXPECT_THROW(safe_cast<uint16_t>(maxuint64), std::overflow_error);
+TEST(SafeCast, BoundaryValues) {
+  EXPECT_THROW(safe_cast<int8_t>(int64_t{-129}), std::underflow_error);
+  EXPECT_NO_THROW(safe_cast<int8_t>(int64_t{-128}));
+  EXPECT_NO_THROW(safe_cast<int8_t>(int64_t{0}));
+  EXPECT_NO_THROW(safe_cast<int8_t>(int64_t{127}));
+  EXPECT_THROW(safe_cast<int8_t>(int64_t{128}), std::overflow_error);
 
-  EXPECT_NO_THROW(safe_cast<uint16_t>(minuint8));
-  EXPECT_NO_THROW(safe_cast<uint16_t>(minuint16));
-  EXPECT_NO_THROW(safe_cast<uint16_t>(minuint32));
-  EXPECT_NO_THROW(safe_cast<uint16_t>(minuint64));
-
-  EXPECT_NO_THROW(safe_cast<uint16_t>(maxint8));
-  EXPECT_NO_THROW(safe_cast<uint16_t>(maxint16));
-  EXPECT_THROW(safe_cast<uint16_t>(maxint32), std::overflow_error);
-  EXPECT_THROW(safe_cast<uint16_t>(maxint64), std::overflow_error);
-
-  EXPECT_THROW(safe_cast<uint16_t>(minint8), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint16_t>(minint16), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint16_t>(minint32), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint16_t>(minint64), std::underflow_error);
+  EXPECT_NO_THROW(safe_cast<uint8_t>(255));
+  EXPECT_THROW(safe_cast<uint8_t>(256), std::overflow_error);
+  EXPECT_NO_THROW(safe_cast<int16_t>(-32768));
+  EXPECT_THROW(safe_cast<int16_t>(-32769), std::underflow_error);
 }
 
-TEST_F(SafeCast, CastUint32t) {
-  EXPECT_NO_THROW(safe_cast<uint32_t>(maxuint8));
-  EXPECT_NO_THROW(safe_cast<uint32_t>(maxuint16));
-  EXPECT_NO_THROW(safe_cast<uint32_t>(maxuint32));
-  EXPECT_THROW(safe_cast<uint32_t>(maxuint64), std::overflow_error);
+TEST(SafeCast, CorrectReturnType) {
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<int8_t>(int64_t{42})), int8_t>));
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<int16_t>(uint64_t{42})), int16_t>));
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<int32_t>(int16_t{42})), int32_t>));
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<int64_t>(int16_t{42})), int64_t>));
 
-  EXPECT_NO_THROW(safe_cast<uint32_t>(minuint8));
-  EXPECT_NO_THROW(safe_cast<uint32_t>(minuint16));
-  EXPECT_NO_THROW(safe_cast<uint32_t>(minuint32));
-  EXPECT_NO_THROW(safe_cast<uint32_t>(minuint64));
-
-  EXPECT_NO_THROW(safe_cast<uint32_t>(maxint8));
-  EXPECT_NO_THROW(safe_cast<uint32_t>(maxint16));
-  EXPECT_NO_THROW(safe_cast<uint32_t>(maxint32));
-  EXPECT_THROW(safe_cast<uint32_t>(maxint64), std::overflow_error);
-
-  EXPECT_THROW(safe_cast<uint32_t>(minint8), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint32_t>(minint16), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint32_t>(minint32), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint32_t>(minint64), std::underflow_error);
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<uint8_t>(int64_t{42})), uint8_t>));
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<uint16_t>(int8_t{42})), uint16_t>));
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<uint32_t>(int16_t{42})), uint32_t>));
+  EXPECT_TRUE(
+      (std::is_same_v<decltype(safe_cast<uint64_t>(int16_t{42})), uint64_t>));
 }
 
-TEST_F(SafeCast, CastUint64t) {
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxuint8));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxuint16));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxuint32));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxuint64));
-
-  EXPECT_NO_THROW(safe_cast<uint64_t>(minuint8));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(minuint16));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(minuint32));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(minuint64));
-
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxint8));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxint16));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxint32));
-  EXPECT_NO_THROW(safe_cast<uint64_t>(maxint64));
-
-  EXPECT_THROW(safe_cast<uint64_t>(minint8), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint64_t>(minint16), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint64_t>(minint32), std::underflow_error);
-  EXPECT_THROW(safe_cast<uint64_t>(minint64), std::underflow_error);
+TEST(SafeCast, CheckValueOutput) {
+  EXPECT_EQ(safe_cast<int8_t>(0), 0);
+  EXPECT_EQ(safe_cast<uint8_t>(0), 0);
+  EXPECT_EQ(safe_cast<int8_t>(1), 1);
+  EXPECT_EQ(safe_cast<int8_t>(-1), -1);
+  EXPECT_EQ(safe_cast<int32_t>(std::numeric_limits<int32_t>::max()),
+            std::numeric_limits<int32_t>::max());
 }
-
-TEST_F(SafeCast, CastInt8t) {
-  EXPECT_NO_THROW(safe_cast<int8_t>(maxint8));
-  EXPECT_THROW(safe_cast<int8_t>(maxint16), std::overflow_error);
-  EXPECT_THROW(safe_cast<int8_t>(maxint32), std::overflow_error);
-  EXPECT_THROW(safe_cast<int8_t>(maxint64), std::overflow_error);
-
-  EXPECT_NO_THROW(safe_cast<int8_t>(minint8));
-  EXPECT_THROW(safe_cast<int8_t>(minint16), std::underflow_error);
-  EXPECT_THROW(safe_cast<int8_t>(minint32), std::underflow_error);
-  EXPECT_THROW(safe_cast<int8_t>(minint64), std::underflow_error);
-
-  EXPECT_NO_THROW(safe_cast<int8_t>(minuint8));
-  EXPECT_THROW(safe_cast<int8_t>(maxuint8), std::overflow_error);
-  EXPECT_THROW(safe_cast<int8_t>(maxuint16), std::overflow_error);
-  EXPECT_THROW(safe_cast<int8_t>(maxuint32), std::overflow_error);
-  EXPECT_THROW(safe_cast<int8_t>(maxuint64), std::overflow_error);
-}
-
-/*
-TEST(SafeCast, CastInt8t) {
-    int8_t val = 127;
-    int16_t overval = 128;
-    int16_t underval = -129;
-
-    EXPECT_NO_THROW(safe_cast<int8_t>(val));
-    EXPECT_THROW(safe_cast<int8_t>(overval), std::overflow_error);
-    EXPECT_THROW(safe_cast<int8_t>(underval), std::underflow_error);
-}
-
-TEST(SafeCast, CastUint16t) {
-    uint16_t constexpr  val = 65535U;
-    uint32_t constexpr overval = 65536U;
-    int32_t constexpr underval = -1;
-
-    EXPECT_NO_THROW(safe_cast<uint16_t>(val));
-    EXPECT_THROW(safe_cast<uint16_t>(overval), std::overflow_error);
-    EXPECT_THROW(safe_cast<uint16_t>(underval), std::underflow_error);
-}
-
-TEST(SafeCast, CastInt16t) {
-    int16_t constexpr val = 32767;
-    int32_t constexpr overval = 32768;
-    int32_t constexpr  underval = -32769;
-
-    EXPECT_NO_THROW(safe_cast<int16_t>(val));
-    EXPECT_THROW(safe_cast<int16_t>(overval), std::overflow_error);
-    EXPECT_THROW(safe_cast<int16_t>(underval), std::underflow_error);
-}
-
-TEST(SafeCast, CastUint32t) {
-    uint32_t constexpr val = 4294967295U;
-    uint64_t constexpr overval = 4294967296ULL;
-    int64_t constexpr underval = -1LL;
-
-    EXPECT_NO_THROW(safe_cast<uint32_t>(val));
-    EXPECT_THROW(safe_cast<uint32_t>(overval), std::overflow_error);
-    EXPECT_THROW(safe_cast<uint32_t>(underval), std::underflow_error);
-}
-
-TEST(SafeCast, CastInt32t) {
-    int32_t constexpr val = 2147483647;
-    int64_t constexpr overval = 2147483648LL;
-    int64_t constexpr underval = -2147483649LL;
-
-    EXPECT_NO_THROW(safe_cast<int32_t>(val));
-    EXPECT_THROW(safe_cast<int32_t>(overval), std::overflow_error);
-    EXPECT_THROW(safe_cast<int32_t>(underval), std::underflow_error);
-}
-
-TEST(SafeCast, CastUint64t) {
-    uint64_t constexpr val = std::numeric_limits<uint64_t>::max();
-    int64_t constexpr underval = -1LL;
-
-    EXPECT_NO_THROW(safe_cast<uint64_t>(val));
-    EXPECT_THROW(safe_cast<uint64_t>(underval), std::underflow_error);
-}
-
-TEST(SafeCast, CastInt64t) {
-    int64_t constexpr val = std::numeric_limits<int64_t>::max();
-    uint64_t constexpr overval =
-static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1;
-
-    EXPECT_NO_THROW(safe_cast<int64_t>(val));
-    EXPECT_THROW(safe_cast<int64_t>(overval), std::overflow_error);
-}
-
-TEST(SafeCast, CastBetweenSignedAndUnsigned) {
-    int32_t constexpr signed_val = -1;
-    uint32_t constexpr unsigned_val = 0xFFFFFFFF;
-
-    EXPECT_THROW(safe_cast<uint32_t>(signed_val), std::underflow_error);
-    EXPECT_THROW(safe_cast<int32_t>(unsigned_val), std::overflow_error);
-}
-
-TEST(SafeCast, CastToSmallerUnsignedType) {
-    uint32_t constexpr large_val = 1000000;
-    uint16_t constexpr small_val = 1000;
-
-    EXPECT_THROW(safe_cast<uint16_t>(large_val), std::overflow_error);
-    EXPECT_NO_THROW(safe_cast<uint16_t>(small_val));
-}
-
-TEST(SafeCast, CastToSmallerSignedType) {
-    int32_t constexpr large_positive = 100000;
-    int32_t constexpr large_negative = -100000;
-    int16_t constexpr  small_val = 1000;
-
-    EXPECT_THROW(safe_cast<int16_t>(large_positive), std::overflow_error);
-    EXPECT_THROW(safe_cast<int16_t>(large_negative), std::underflow_error);
-    EXPECT_NO_THROW(safe_cast<int16_t>(small_val));
-}
-
-TEST(SafeCast, EdgeCases) {
-    EXPECT_NO_THROW(safe_cast<int8_t>(std::numeric_limits<int8_t>::min()));
-    EXPECT_NO_THROW(safe_cast<int8_t>(std::numeric_limits<int8_t>::max()));
-    EXPECT_NO_THROW(safe_cast<uint8_t>(std::numeric_limits<uint8_t>::max()));
-    EXPECT_NO_THROW(safe_cast<uint8_t>(std::numeric_limits<uint8_t>::min()));
-}
-
-TEST(SafeCast, CorrectValues) {
-    EXPECT_EQ(safe_cast<int16_t>(32767), 32767);
-    EXPECT_EQ(safe_cast<uint16_t>(65535U), 65535U);
-    EXPECT_EQ(safe_cast<int32_t>(-1), -1);
-    EXPECT_EQ(safe_cast<uint32_t>(4294967295U), 4294967295U);
-}
-
-TEST(SafeCast, SameTypeCast) {
-    EXPECT_EQ(safe_cast<int32_t>(42), 42);
-    EXPECT_EQ(safe_cast<uint64_t>(18446744073709551615ULL),
-18446744073709551615ULL);
-}
-*/
 }  // namespace
 }  // namespace sc

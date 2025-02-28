@@ -43,12 +43,24 @@ namespace sc {
 template <typename T, typename U>
 concept signed_integers = std::signed_integral<T> && std::signed_integral<U>;
 
+static_assert(signed_integers<long long, int>);
+static_assert(signed_integers<long, int>);
+static_assert(signed_integers<short, char>);
+static_assert(!signed_integers<unsigned short, char>);
+static_assert(!signed_integers<short, unsigned int>);
+
 /**
  * @brief Concept to check two types are both unsigned integers.
  */
 template <typename T, typename U>
 concept unsigned_integers =
     std::unsigned_integral<T> && std::unsigned_integral<U>;
+
+static_assert(unsigned_integers<unsigned long long, unsigned int>);
+static_assert(unsigned_integers<unsigned long, unsigned int>);
+static_assert(unsigned_integers<unsigned short, unsigned char>);
+static_assert(!unsigned_integers<unsigned short, char>);
+static_assert(!unsigned_integers<short, unsigned int>);
 
 /**
  * @brief Throws an overflow error with a formatted message.
@@ -117,4 +129,6 @@ To safe_cast(From value) noexcept(false) {
   return static_cast<To>(value);
 }
 }  // namespace sc
-#endif
+
+#endif  // _SAFE_CAST_HPP_
+
