@@ -28,10 +28,6 @@ set_property(TARGET SafeCastTest PROPERTY CXX_STANDARD 20)
 target_link_libraries(SafeCastTest PRIVATE SafeCast GTest::gtest_main)
 gtest_discover_tests(SafeCastTest)
 
-target_compile_options(SafeCastTest PRIVATE
-  $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-)
-
 # Up warning levels for all targets 
 # Many recommendations taken from:
 # https://github.com/cpp-best-practices/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
