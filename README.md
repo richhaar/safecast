@@ -4,11 +4,11 @@ SafeCast is a C++ library that provides a safe way to cast between different num
 
 ## Features
 
-* Header-only library for easy integration
-* Supports casting between signed and unsigned integers of different sizes
-* Throws exceptions for overflow and underflow conditions
-* Compile-time checks to ensure type safety
-* No external dependencies
+* Header-only library for easy integration.
+* Supports casting between signed and unsigned integers of different sizes.
+* Throws exceptions for overflow and underflow conditions.
+* Compile-time checks to ensure type safety.
+* No external dependencies.
 
 
 ## Installation
@@ -43,11 +43,11 @@ try {
 
 ## Licence
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
 
 ## Acknowledgements
 
-This project was inspired by the [boost::numeric_cast](https://www.boost.org/doc/libs/1_77_0/libs/numeric/conversion/doc/html/numeric_cast.html) library, which provides similar functionality for casting between numeric types. SafeCast is designed to be a lightweight alternative that is easier to integrate into existing projects.
+This project was inspired by the [boost::numeric_cast](https://www.boost.org/doc/libs/1_87_0/libs/numeric/conversion/doc/html/boost_numericconversion/improved_numeric_cast__.html) library, which provides similar functionality for casting between numeric types. SafeCast is designed to be a lightweight alternative that is easier to integrate into existing projects.
 
 ## Authors
 
