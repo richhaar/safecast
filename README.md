@@ -1,6 +1,6 @@
 # SafeCast
 
-SafeCast is a C++ library that provides a safe way to cast between different numeric types, preventing overflow and underflow errors. It's designed to be easy to use and integrate into existing projects, offering a lightweight alternative to boost::numeric_cast.
+SafeCast is a C++ library that provides a safe way to cast between different integer types, preventing overflow and underflow errors. It's designed to be easy to use and integrate into existing projects, offering a lightweight alternative to boost::numeric_cast.
 
 ## Features
 
