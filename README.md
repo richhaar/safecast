@@ -4,10 +4,9 @@ SafeCast is a C++ library that provides a safe way to cast between different int
 
 ## Features
 
-* Header-only library for easy integration.
 * Supports casting between signed and unsigned integers of different sizes.
-* Throws exceptions for overflow and underflow conditions.
-* Compile-time checks to ensure type safety.
+* Header-only library.
+* Throws exceptions for overflow and underflow conditions with useful exception messages.
 * No external dependencies.
 
 
