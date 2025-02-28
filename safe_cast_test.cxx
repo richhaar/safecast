@@ -1,5 +1,5 @@
 ﻿/*****************************************************************************
- * @file safe_cast_Test.cxx
+ * @file safe_cast_test.cxx
  * @brief Provides testing for the safe_cast function.
  * @author Richard Haar https://github.com/richhaar
  * @date 28/02/2025
