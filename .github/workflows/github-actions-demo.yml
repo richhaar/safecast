@@ -46,7 +46,7 @@ jobs:
         ls *
     - name: Clang-tidy
       run: |
-        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy --use-color --header-filter=.* -p .
+        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy --use-color --header-filter=.* -p bin
 
   test:
     needs: build
