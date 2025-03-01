@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Generate
-      run: cmake -G Ninja -S . -B bin
+      run: cmake -S . -B bin
     - name: Build
       run: |
           cd bin
@@ -52,11 +52,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-      - name: Debug
-        run: |
-          ls
-          pwd
-          ls *
       - name: Test
         run: |
           chmod +x ./SafeCastTest
