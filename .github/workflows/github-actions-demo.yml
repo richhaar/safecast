@@ -1,18 +1,62 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: C/C++ CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
-  Explore-GitHub-Actions:
+  format:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+    - uses: actions/checkout@v4
+    - name: clang-format
+      uses: jayllyz/clang-format-action@v1
+      with:
+        check: true
+        style: file
+        extensions: cxx,hpp
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install clang-tidy
+      run: sudo apt-get install -y clang-tidy
+    - name: Run clang-tidy
+      run: |
+        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy -p build
+    - name: Echo
+      run: |
+        echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+        echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+        echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+    
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Generate
+      run: cmake -S . -B bin
+    - name: Build
+      run: |
+          cd bin
+          make -j $(nproc)
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-output
+        path: bin
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      #- uses: actions/checkout@v2
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build-output
+      - name: Test
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          cd bin
+          ./SafeCastTest
