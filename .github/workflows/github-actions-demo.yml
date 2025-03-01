@@ -7,26 +7,16 @@ on:
 
 jobs:
   format:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
-    #- name: Install clang-format
-      #run: sudo apt-get install -y clang-format
-    - name: Debug
-      run: |
-        clang-format --version
-        clang-tidy --version
-        pwd
-        clang-format -style=google -dump-config
     - name: Clang-format
       run: find . -name '*.cxx' -or -name '*.hpp' | xargs clang-format --dry-run -Werror
     
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
-    - name: Install clang-tidy
-      run: sudo apt-get install -y clang-tidy
     - name: Generate
       run: cmake -S . -B bin -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     - name: Build
@@ -41,9 +31,22 @@ jobs:
       with:
         name: build-output
         path: bin
+
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-output
+    - name: Clang-tidy
+      run: |
+        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy --use-color --header-filter=.* -p bin
+
   test:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -56,5 +59,4 @@ jobs:
           ls *
       - name: Test
         run: |
-          cd bin
           ./SafeCastTest
