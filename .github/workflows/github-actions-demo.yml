@@ -17,6 +17,7 @@ jobs:
         clang-format --version
         clang-tidy --version
         pwd
+        clang-format -style=google -dump-config
     - name: Clang-format
       run: find . -name '*.cxx' -or -name '*.hpp' | xargs clang-format --dry-run -Werror
     
@@ -44,15 +45,15 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
       - name: Debug
         run: |
           ls
           pwd
           ls *
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-output
       - name: Test
         run: |
           cd bin
