@@ -131,4 +131,3 @@ To safe_cast(From value) noexcept(false) {
 }  // namespace sc
 
 #endif  // _SAFE_CAST_HPP_
-

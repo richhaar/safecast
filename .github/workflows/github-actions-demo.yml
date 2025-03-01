@@ -1,0 +1,58 @@
+name: C++ CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Clang-format
+      run: find . -name '*.cxx' -or -name '*.hpp' | xargs clang-format --dry-run -Werror
+    
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Generate
+      run: cmake -S . -B bin
+    - name: Build
+      run: |
+          cd bin
+          make -j $(nproc)
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-output
+        path: bin
+
+  lint:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-output
+        path: bin
+    - name: Clang-tidy
+      run: |
+        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy --use-color --header-filter=.* -p bin
+
+  test:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      #- uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+      - name: Test
+        run: |
+          chmod +x ./SafeCastTest
+          ./SafeCastTest

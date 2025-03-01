@@ -28,6 +28,8 @@ set_property(TARGET SafeCastTest PROPERTY CXX_STANDARD 20)
 target_link_libraries(SafeCastTest PRIVATE SafeCast GTest::gtest_main)
 gtest_discover_tests(SafeCastTest)
 
+set_target_properties(SafeCastTest PROPERTIES EXPORT_COMPILE_COMMANDS ON) # For clang-tidy
+
 # Up warning levels, many recommendations taken from:
 # https://github.com/cpp-best-practices/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
 if(MSVC)
