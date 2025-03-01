@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install clang-format
-      run: sudo apt-get install -y clang-format
+    #- name: Install clang-format
+      #run: sudo apt-get install -y clang-format
     - name: Debug
       run: |
-        ls
+        clang-format --version
+        clang-tidy --version
         pwd
-        ls *
     - name: Clang-format
       run: find . -name '*.cxx' -or -name '*.hpp' | xargs clang-format --dry-run -Werror
     
