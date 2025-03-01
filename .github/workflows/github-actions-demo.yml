@@ -33,19 +33,20 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    #- uses: actions/checkout@v4
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
         name: build-output
     - name: Clang-tidy
       run: |
-        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy --use-color --header-filter=.* -p bin
+        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy --use-color --header-filter=.* -p .
 
   test:
     needs: build
     runs-on: ubuntu-24.04
     steps:
+      #- uses: actions/checkout@v4
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -57,4 +58,5 @@ jobs:
           ls *
       - name: Test
         run: |
+          chmod +x ./SafeCastTest
           ./SafeCastTest
