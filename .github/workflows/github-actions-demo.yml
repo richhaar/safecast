@@ -10,12 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: clang-format
-      uses: jayllyz/clang-format-action@v1
-      with:
-        check: true
-        style: file
-        extensions: cxx,hpp
+    - name: Install clang-format
+      run: sudo apt-get install -y clang-format
+    - name: Debug
+      run: |
+        ls
+        pwd
+        ls *
+    - name: Clang-format
+      run: find . -name '*.cxx' -or -name '*.hpp' | xargs clang-format --dry-run -Werror
     
   build:
     runs-on: ubuntu-latest
@@ -41,6 +44,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Debug
+        run: |
+          ls
+          pwd
+          ls *
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
