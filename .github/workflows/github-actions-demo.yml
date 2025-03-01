@@ -18,11 +18,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Generate
-      run: cmake -S . -B bin -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      run: cmake -G Ninja -S . -B bin
     - name: Build
       run: |
           cd bin
-          make -j $(nproc)
+          ninja
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -39,11 +39,6 @@ jobs:
       with:
         name: build-output
         path: bin
-    - name: Debug
-      run: |
-        ls
-        pwd
-        ls *
     - name: Clang-tidy
       run: |
         find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy --use-color --header-filter=.* -p bin
