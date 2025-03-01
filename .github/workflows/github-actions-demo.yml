@@ -16,34 +16,24 @@ jobs:
         check: true
         style: file
         extensions: cxx,hpp
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install clang-tidy
-      run: sudo apt-get install -y clang-tidy
-    - name: Run clang-tidy
-      run: |
-        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy -p build
-    - name: Echo
-      run: |
-        echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-        echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-        echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
     
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Install clang-tidy
+      run: sudo apt-get install -y clang-tidy
     - name: Generate
-      run: cmake -S . -B bin
+      run: cmake -S . -B bin -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     - name: Build
       run: |
           cd bin
           make -j $(nproc)
+    - name: Clang-tidy
+      run: |
+        find . -name '*.cxx' -or -name '*.hpp' | xargs clang-tidy -p bin
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: build-output
         path: bin
@@ -51,9 +41,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      #- uses: actions/checkout@v2
       - name: Download build artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build-output
       - name: Test
